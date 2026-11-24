@@ -24,7 +24,7 @@ if (todayLabel) {
   });
 }
 
-let state = { tasks: [], habits: [], notes: '' };
+let state = { tasks: [], habits: [] };
 let lastSavedJson = '';
 
 const headers = {
@@ -44,9 +44,7 @@ async function fetchState(isInitial = false) {
       headers: headers
     });
 
-    if (!res.ok) {
-      throw new Error('HTTP ' + res.status);
-    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
 
     const rows = await res.json();
     if (dot) {
@@ -57,8 +55,8 @@ async function fetchState(isInitial = false) {
       status.textContent = 'Облако подключено';
     }
 
-    if (rows && rows.length > 0 && rows[0].data) {
-      const incoming = { tasks: [], habits: [], notes: '', ...rows[0].data };
+    if (rows && rows.length > 0 && rows.data) {
+      const incoming = { tasks: [], habits: [], ...rows.data };
       const incomingJson = JSON.stringify(incoming);
       if (isInitial || incomingJson !== lastSavedJson) {
         state = incoming;
@@ -94,10 +92,6 @@ async function saveState() {
 function renderAll() {
   renderTasks();
   renderHabits();
-  const notesEl = document.getElementById('notesArea');
-  if (notesEl && document.activeElement !== notesEl) {
-    notesEl.value = state.notes || '';
-  }
 }
 
 function switchTab(tab) {
@@ -262,53 +256,6 @@ function deleteHabit(i) {
   state.habits.splice(i, 1);
   renderHabits();
   saveState();
-}
-
-let noteTimer = null;
-function debouncedSaveNotes() {
-  const notesEl = document.getElementById('notesArea');
-  if (!notesEl) return;
-  state.notes = notesEl.value;
-  clearTimeout(noteTimer);
-  noteTimer = setTimeout(saveState, 400);
-}
-
-let timerSec = 25 * 60;
-let timerInt = null;
-
-function toggleTimer() {
-  const btn = document.getElementById('startBtn');
-  if (timerInt) {
-    clearInterval(timerInt);
-    timerInt = null;
-    if (btn) btn.textContent = 'Старт';
-  } else {
-    if (btn) btn.textContent = 'Пауза';
-    timerInt = setInterval(() => {
-      if (timerSec > 0) {
-        timerSec--;
-        const disp = document.getElementById('timerDisplay');
-        if (disp) {
-          disp.textContent = `${String(Math.floor(timerSec / 60)).padStart(2, '0')}:${String(timerSec % 60).padStart(2, '0')}`;
-        }
-      } else {
-        clearInterval(timerInt);
-        timerInt = null;
-        if (btn) btn.textContent = 'Старт';
-        alert('Фокус-сессия завершена!');
-      }
-    }, 1000);
-  }
-}
-
-function resetTimer() {
-  clearInterval(timerInt);
-  timerInt = null;
-  timerSec = 25 * 60;
-  const btn = document.getElementById('startBtn');
-  const disp = document.getElementById('timerDisplay');
-  if (btn) btn.textContent = 'Старт';
-  if (disp) disp.textContent = '25:00';
 }
 
 function escapeHtml(s) {
