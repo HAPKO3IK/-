@@ -1,10 +1,10 @@
-const CACHE_NAME = 'vibeplanner-v1';
+const CACHE_NAME = 'vibeplanner-v4';
 const ASSETS = [
   './',
   './index.html',
-  './style.css',
   './app.js',
-  './manifest.json'
+  './manifest.json',
+  './icon.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -20,13 +20,11 @@ self.addEventListener('activate', (event) => {
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  // Запросы к Supabase не кэшируем, всегда идём в сеть
-  if (event.request.url.includes('supabase.co')) {
-    return;
-  }
+  if (event.request.url.includes('supabase.co')) return;
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
