@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f1117">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <title>Планер</title>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div>
+      <div class="logo"><span>Планер
+      </span></div>
+      <div class="sync-badge"><div class="dot" id="syncDot"></div><span id="syncStatus">Подключение...</span></div>
+      <button class="nav-btn active" data-tab="tasks" onclick="switchTab('tasks')">📋 Задачи на день</button>
+      <button class="nav-btn" data-tab="habits" onclick="switchTab('habits')">🔥 Трекер привычек</button>
+      <button class="nav-btn" data-tab="notes" onclick="switchTab('notes')">🧠 Быстрые заметки</button>
+    </div>
+</aside>
+
+  <main class="main">
+    <section id="view-tasks" class="view active">
+      <div class="header-row">
+        <h1>План на сегодня</h1>
+        <span id="progressText" style="color: var(--muted); font-weight: 700;">0%</span>
+      </div>
+      <div class="sub-date" id="todayLabel"></div>
+      <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
+      <div class="input-bar">
+        <input type="text" id="taskInput" placeholder="Добавить задачу..." onkeydown="if(event.key==='Enter') addTask()">
+        <select id="taskPrio">
+          <option value="high">Высокий</option>
+          <option value="mid" selected>Обычный</option>
+          <option value="low">Низкий</option>
+        </select>
+        <button class="btn-add" onclick="addTask()">+</button>
+      </div>
+      <div id="tasksList"></div>
+    </section>
+
+    <section id="view-habits" class="view">
+      <div class="header-row"><h1>Трекер привычек</h1></div>
+      <div class="sub-date">Отмечай каждый день, чтобы не прерывать серию</div>
+      <div class="input-bar">
+        <input type="text" id="habitInput" placeholder="Новая привычка..." onkeydown="if(event.key==='Enter') addHabit()">
+        <button class="btn-add" onclick="addHabit()">+</button>
+      </div>
+      <div id="habitsList"></div>
+    </section>
+
+    <section id="view-notes" class="view">
+      <div class="header-row">
+        <h1>Заметки</h1>
+        <span style="font-size:12px; color:var(--green);">● Автосинхронизация</span>
+      </div>
+      <div id="notesWrap"></div>
+    </section>
+  </main>
+
+  <nav class="mobile-nav">
+    <button class="m-btn active" data-tab="tasks" onclick="switchTab('tasks')"><span>📋</span>Задачи</button>
+    <button class="m-btn" data-tab="habits" onclick="switchTab('habits')"><span>🔥</span>Привычки</button>
+    <button class="m-btn" data-tab="notes" onclick="switchTab('notes')"><span>🧠</span>Заметки</button>
+  </nav>
+
+  <script>
+    document.getElementById('notesWrap').innerHTML = '<textarea id="notesArea" class="notes-area" placeholder="Идеи, списки, мысли..." oninput="debouncedSaveNotes()"></textarea>';
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
